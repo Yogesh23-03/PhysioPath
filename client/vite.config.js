@@ -5,7 +5,7 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   base: "/",                          // ADD THIS
   build: {
-    outDir: "../server/public",       // ADD THIS
+    outDir: "dist",       // ADD THIS
     emptyOutDir: true,
   },
   plugins: [
