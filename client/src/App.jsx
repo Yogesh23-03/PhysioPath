@@ -8,6 +8,10 @@ import './index.css'
 import Dashboard from './pages/Dashboard'
 import PlanBuilder from './pages/PlanBuilder'
 
+import PatientPortal from './pages/PatientPortal'
+import WorkoutEngine from './pages/WorkoutEngine'
+import History from './pages/History'
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -39,7 +43,9 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
-      <Route path="/patient/:token" element={<div className="page-container">Patient Portal (Coming Soon)</div>} />
+      <Route path="/patient/:token" element={<PatientPortal />} />
+      <Route path="/workout/:token" element={<WorkoutEngine />} />
+      <Route path="/history/:token" element={<History />} />
     </Routes>
   );
 }
