@@ -25,6 +25,10 @@ app.use('/api/gemini', geminiRoutes);
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 const PORT = process.env.PORT || 5000;
 
 mongoose.connect(process.env.MONGODB_URI)
