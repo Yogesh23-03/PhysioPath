@@ -1,7 +1,8 @@
 import Dexie from 'dexie';
 
 export const db = new Dexie('PhysioPathDB');
-db.version(1).stores({
+db.version(2).stores({
     plans: 'token, patientName, createdAt',
-    progress: '++id, token, date, exerciseId, setsDone'
+    daily_logs: '++id, token, date, completedExerciseIds', // completedExerciseIds is an array
+    settings: 'id, lastVisitDate' // For daily reset logic
 });
