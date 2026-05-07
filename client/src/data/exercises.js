@@ -3,6 +3,7 @@ export const exerciseLibrary = [
         id: 'ex1',
         name: 'Quad Sets',
         muscleGroup: 'Quadriceps',
+        imageUrl: '/quadsets.jpeg',
         description: 'Activate the thigh muscle while the knee stays straight and supported.',
         steps: [
             { order: 1, instruction: 'Sit or lie with the target leg straight and supported.' },
@@ -18,6 +19,7 @@ export const exerciseLibrary = [
         id: 'ex2',
         name: 'Glute Bridges',
         muscleGroup: 'Glutes / Hamstrings',
+        imageUrl: '/glutebridges.jpeg',
         description: 'Build hip and posterior-chain strength with a controlled hip lift.',
         steps: [
             { order: 1, instruction: 'Lie on your back with knees bent and feet flat, hip-width apart.' },
@@ -33,6 +35,7 @@ export const exerciseLibrary = [
         id: 'ex3',
         name: 'Wall Slides',
         muscleGroup: 'Shoulders / Scapula',
+        imageUrl: '/wallslides.jpeg',
         description: 'Improve shoulder mobility while training smooth scapular control.',
         steps: [
             { order: 1, instruction: 'Stand with your back against a wall and ribs relaxed.' },
@@ -48,6 +51,7 @@ export const exerciseLibrary = [
         id: 'ex4',
         name: 'Ankle Pumps',
         muscleGroup: 'Calves / Circulation',
+        imageUrl: '/anklepumps.jpeg',
         description: 'Move the ankle through a gentle range to support circulation.',
         steps: [
             { order: 1, instruction: 'Sit or lie with both legs supported.' },
@@ -63,6 +67,7 @@ export const exerciseLibrary = [
         id: 'ex5',
         name: 'Heel Slides',
         muscleGroup: 'Knee Mobility',
+        imageUrl: '/legraises.jpeg',
         description: 'Restore knee bending range with a slow heel slide.',
         steps: [
             { order: 1, instruction: 'Lie on your back with the leg straight.' },
@@ -78,6 +83,7 @@ export const exerciseLibrary = [
         id: 'ex6',
         name: 'Straight Leg Raise',
         muscleGroup: 'Quadriceps / Hip Flexors',
+        imageUrl: '/straightlegraises.jpeg',
         description: 'Strengthen the front of the hip and thigh while protecting the knee.',
         steps: [
             { order: 1, instruction: 'Lie down with one knee bent and the working leg straight.' },
@@ -93,6 +99,7 @@ export const exerciseLibrary = [
         id: 'ex7',
         name: 'Clamshells',
         muscleGroup: 'Hip Stabilizers',
+        imageUrl: '/clamshells.jpeg',
         description: 'Train hip control with a small, precise side-lying movement.',
         steps: [
             { order: 1, instruction: 'Lie on your side with knees bent and feet together.' },
@@ -108,6 +115,7 @@ export const exerciseLibrary = [
         id: 'ex8',
         name: 'Seated Knee Extension',
         muscleGroup: 'Quadriceps',
+        imageUrl: '/seatedkneeExtension.jpeg',
         description: 'Build knee extension strength from a stable seated position.',
         steps: [
             { order: 1, instruction: 'Sit tall with feet flat and knees bent.' },

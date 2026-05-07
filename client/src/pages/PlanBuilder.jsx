@@ -56,6 +56,7 @@ const PlanBuilder = () => {
                     name: ex.name,
                     muscleGroup: ex.muscleGroup,
                     description: ex.description,
+                    imageUrl: ex.imageUrl,
                     sets: parseInt(ex.sets),
                     reps: parseInt(ex.reps),
                     restSeconds: parseInt(ex.restSeconds),
@@ -93,96 +94,134 @@ const PlanBuilder = () => {
                 </button>
             </header>
 
-            <main className="builder-content">
-                <section className="patient-details card">
-                    <h3><Info size={18} /> Patient Information</h3>
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label>Patient Name</label>
-                            <input 
-                                type="text" 
-                                placeholder="e.g. John Doe" 
-                                value={patientName}
-                                onChange={(e) => setPatientName(e.target.value)}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Duration (Weeks)</label>
-                            <select value={durationWeeks} onChange={(e) => setDurationWeeks(e.target.value)}>
-                                {[1, 2, 4, 6, 8, 12].map(w => (
-                                    <option key={w} value={w}>{w} Weeks</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                </section>
-
-                <section className="selected-exercises">
-                    <div className="section-header">
-                        <h3>Prescribed Exercises</h3>
-                        <button onClick={() => setShowLibrary(true)} className="add-btn">
-                            <Plus size={18} /> Add Exercise
-                        </button>
-                    </div>
-
-                    <div className="exercise-list">
-                        {selectedExercises.length === 0 ? (
-                            <div className="empty-list-prompt">
-                                <p>No exercises added yet. Click "Add Exercise" to start.</p>
+            <main className="builder-content plan-creator-layout">
+                <section className="plan-form-column">
+                    <section className="patient-details card glass-card">
+                        <h3><Info size={18} /> Patient Information</h3>
+                        <div className="form-row">
+                            <div className="form-group floating-field">
+                                <input 
+                                    type="text" 
+                                    placeholder=" " 
+                                    value={patientName}
+                                    onChange={(e) => setPatientName(e.target.value)}
+                                />
+                                <label>Patient Name</label>
                             </div>
-                        ) : (
-                            selectedExercises.map((ex) => (
-                                <motion.div 
-                                    layout
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    key={ex.instanceId} 
-                                    className="exercise-item card"
-                                >
-                                    <div className="exercise-info">
-                                        <h4>{ex.name}</h4>
-                                        <span className="tag">{ex.muscleGroup}</span>
-                                    </div>
-                                    <div className="exercise-config">
-                                        <div className="config-field">
-                                            <label>Sets</label>
-                                            <input 
-                                                type="number" 
-                                                value={ex.sets} 
-                                                onChange={(e) => updateExercise(ex.instanceId, 'sets', e.target.value)}
-                                            />
+                            <div className="form-group floating-field">
+                                <select value={durationWeeks} onChange={(e) => setDurationWeeks(e.target.value)}>
+                                    {[1, 2, 4, 6, 8, 12].map(w => (
+                                        <option key={w} value={w}>{w} Weeks</option>
+                                    ))}
+                                </select>
+                                <label>Duration</label>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="selected-exercises">
+                        <div className="section-header">
+                            <h3>Prescribed Exercises</h3>
+                            <button onClick={() => setShowLibrary(true)} className="add-btn">
+                                <Plus size={18} /> Add Exercise
+                            </button>
+                        </div>
+
+                        <div className="exercise-list">
+                            {selectedExercises.length === 0 ? (
+                                <div className="empty-list-prompt glass-card">
+                                    <p>No exercises added yet. Click "Add Exercise" to start.</p>
+                                </div>
+                            ) : (
+                                selectedExercises.map((ex) => (
+                                    <motion.div 
+                                        layout
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        key={ex.instanceId} 
+                                        className="exercise-item card glass-card hover-lift"
+                                    >
+                                        <div className="exercise-info">
+                                            <h4>{ex.name}</h4>
+                                            <span className="tag">{ex.muscleGroup}</span>
                                         </div>
-                                        <div className="config-field">
-                                            <label>Reps</label>
-                                            <input 
-                                                type="number" 
-                                                value={ex.reps} 
-                                                onChange={(e) => updateExercise(ex.instanceId, 'reps', e.target.value)}
-                                            />
+                                        <div className="exercise-config">
+                                            <div className="config-field">
+                                                <label>Sets</label>
+                                                <input 
+                                                    type="number" 
+                                                    value={ex.sets} 
+                                                    onChange={(e) => updateExercise(ex.instanceId, 'sets', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="config-field">
+                                                <label>Reps</label>
+                                                <input 
+                                                    type="number" 
+                                                    value={ex.reps} 
+                                                    onChange={(e) => updateExercise(ex.instanceId, 'reps', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="config-field">
+                                                <label>Rest (s)</label>
+                                                <input 
+                                                    type="number" 
+                                                    value={ex.restSeconds} 
+                                                    onChange={(e) => updateExercise(ex.instanceId, 'restSeconds', e.target.value)}
+                                                />
+                                            </div>
+                                            <button onClick={() => removeExercise(ex.instanceId)} className="remove-btn">
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
-                                        <div className="config-field">
-                                            <label>Rest (s)</label>
-                                            <input 
-                                                type="number" 
-                                                value={ex.restSeconds} 
-                                                onChange={(e) => updateExercise(ex.instanceId, 'restSeconds', e.target.value)}
-                                            />
+                                        <div className="builder-step-preview">
+                                            {ex.steps.slice(0, 3).map((step) => (
+                                                <div key={step.order} className="builder-step-row">
+                                                    <span>⠿</span>
+                                                    <p>{step.instruction}</p>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <button onClick={() => removeExercise(ex.instanceId)} className="remove-btn">
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                    {ex.mistakes.length > 0 && (
-                                        <div className="mistakes-preview">
-                                            <AlertTriangle size={14} />
-                                            <span>{ex.mistakes[0]} and more...</span>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            ))
-                        )}
-                    </div>
+                                        {ex.mistakes.length > 0 && (
+                                            <div className="mistakes-preview">
+                                                <AlertTriangle size={14} />
+                                                <span>{ex.mistakes[0]} and more...</span>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                ))
+                            )}
+                        </div>
+                    </section>
                 </section>
+
+                <aside className="live-preview-column">
+                    <div className="phone-preview-shell">
+                        <span className="patient-view-badge">Patient View</span>
+                        <div className="phone-frame">
+                            <div className="phone-speaker" />
+                            <div className="phone-greeting glass-card">
+                                <small>Good Morning</small>
+                                <strong>{patientName || 'Patient'}</strong>
+                                <div className="phone-progress">
+                                    <span style={{ width: selectedExercises.length ? '35%' : '8%' }} />
+                                </div>
+                                <p>{selectedExercises.length} exercises prescribed</p>
+                            </div>
+                            <div className="phone-exercise-list">
+                                {(selectedExercises.length ? selectedExercises : exerciseLibrary.slice(0, 2)).slice(0, 4).map((ex) => (
+                                    <article key={ex.instanceId || ex.id} className="phone-ex-card glass-card">
+                                        <img src={ex.imageUrl || '/medical-therapy-hero.svg'} alt="" />
+                                        <div>
+                                            <strong>{ex.name}</strong>
+                                            <span>{ex.sets || ex.defaultSets} sets x {ex.reps || ex.defaultReps} reps</span>
+                                        </div>
+                                    </article>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </main>
 
             {/* Exercise Library Modal */}

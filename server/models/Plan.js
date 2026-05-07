@@ -11,6 +11,7 @@ const exerciseSchema = new mongoose.Schema({
     name: { type: String, required: true },
     muscleGroup: { type: String },
     description: { type: String },
+    imageUrl: { type: String },
     sets: { type: Number, required: true },
     reps: { type: Number, required: true },
     restSeconds: { type: Number, default: 30 },

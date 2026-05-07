@@ -9,6 +9,7 @@ const speechLangMap = {
     en: 'en-US',
     hi: 'hi-IN',
     ta: 'ta-IN',
+    te: 'te-IN',
     kn: 'kn-IN',
     es: 'es-ES'
 };

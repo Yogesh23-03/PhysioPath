@@ -183,7 +183,11 @@ const PatientPortal = () => {
                                     onClick={() => navigate(`/exercise/${token}/${exercise.id}`)}
                                 >
                                     <div className="exercise-visual">
-                                        <ShieldCheck size={28} />
+                                        {guide?.imageUrl || exercise.imageUrl ? (
+                                            <img src={guide?.imageUrl || exercise.imageUrl} alt="" />
+                                        ) : (
+                                            <ShieldCheck size={28} />
+                                        )}
                                     </div>
                                     <div className="exercise-copy">
                                         <span>{exercise.muscleGroup || 'Mobility'}</span>

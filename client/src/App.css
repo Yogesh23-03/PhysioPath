@@ -311,6 +311,13 @@ button { cursor: pointer; }
   place-items: center;
   color: var(--primary);
   background: var(--primary-soft);
+  overflow: hidden;
+}
+
+.exercise-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .exercise-copy h3 {
@@ -1838,4 +1845,520 @@ body {
 .create-plan-btn,
 .voice-action-btn {
   animation: novaGlow 4.2s ease-in-out infinite;
+}
+
+/* ACTIVE FINAL THEME: PhysioPath light mint/amber glassmorphism */
+:root {
+  --primary: #2D6A4F;
+  --primary-dark: #143A2A;
+  --primary-soft: rgba(45, 106, 79, .1);
+  --accent: #F5A623;
+  --ink: #18342A;
+  --muted: #5F756D;
+  --line: rgba(255, 255, 255, .8);
+  --bg: #F0F7FF;
+  --panel: rgba(255, 255, 255, .6);
+  --shadow: 0 12px 32px rgba(45, 106, 79, .15);
+}
+
+body,
+.doctor-main,
+.builder-content,
+.patient-shell,
+.detail-shell,
+.patient-main,
+.detail-main {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(45,106,79,.12), transparent 28%),
+    radial-gradient(circle at 86% 20%, rgba(245,166,35,.14), transparent 26%),
+    linear-gradient(135deg, #F0F7FF 0%, #FFFFFF 62%);
+}
+
+.glass-card,
+.card,
+.exercise-item,
+.patient-details,
+.doctor-metrics article,
+.doctor-panel,
+.detail-panel,
+.prescription-row div,
+.activity-item,
+.exercise-card,
+.recovery-card,
+.metric-tile,
+.timeline-strip,
+.login-card,
+.modal-content,
+.empty-list-prompt,
+.empty-state,
+.phone-greeting,
+.phone-ex-card {
+  color: var(--ink);
+  background: rgba(255, 255, 255, .6);
+  border: 1px solid rgba(255, 255, 255, .8);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+}
+
+.builder-header,
+.detail-header,
+.workout-topbar,
+.patient-nav,
+.doctor-sidebar {
+  color: var(--ink);
+  background: rgba(255, 255, 255, .72);
+  border-color: rgba(255, 255, 255, .8);
+  backdrop-filter: blur(20px);
+}
+
+.doctor-sidebar button {
+  color: var(--ink);
+}
+
+.doctor-sidebar button.active,
+.doctor-sidebar button:hover,
+.offline-pill,
+.set-chip,
+.user-chip,
+.brand-mark,
+.tag,
+.nav-item.active,
+.back-btn,
+.table-actions button {
+  color: #fff;
+  background: var(--primary);
+}
+
+.primary-action,
+.create-plan-btn,
+.login-btn,
+.save-btn,
+.add-btn,
+.done-btn,
+.share-link-box button,
+.voice-action-btn,
+.hero-cta {
+  color: #fff;
+  background: var(--primary);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(45,106,79,.22);
+  transition: transform .2s ease, box-shadow .2s ease;
+  animation: none;
+}
+
+.primary-action:hover,
+.create-plan-btn:hover,
+.login-btn:hover,
+.save-btn:hover,
+.add-btn:hover,
+.voice-action-btn:hover,
+.hero-cta:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 38px rgba(45,106,79,.26);
+}
+
+.secondary-action,
+.icon-text-btn,
+.language-select {
+  color: var(--primary);
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(255,255,255,.8);
+  border-radius: 12px;
+}
+
+.icon-btn {
+  color: var(--primary-dark);
+  background: rgba(255,255,255,.68);
+}
+
+.patient-hero,
+.doctor-hero-banner,
+.workout-shell {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 82% 20%, rgba(245,166,35,.18), transparent 26%),
+    linear-gradient(135deg, rgba(240,247,255,.96), rgba(255,255,255,.72)),
+    url('/physio-device-hero.svg') center / cover no-repeat;
+  border-radius: 0 0 28px 28px;
+}
+
+.patient-hero::after,
+.doctor-hero-banner::after {
+  background: radial-gradient(circle, rgba(45,106,79,.16), transparent 64%);
+}
+
+.doctor-hero-banner h2,
+.patient-hero h1,
+.detail-main h1 {
+  color: var(--primary-dark);
+}
+
+.doctor-hero-banner p,
+.hero-mini-copy,
+.timeline-strip span,
+.language-row,
+.card-label,
+.metric-tile span,
+.exercise-copy span,
+.activity-item span,
+.patient-table span,
+.guide-panel p,
+.step-item p,
+.voice-panel > p,
+.voice-lines blockquote,
+.caution-panel li {
+  color: var(--muted);
+}
+
+.eyebrow,
+.metric-tile svg,
+.doctor-metrics svg,
+.activity-item svg,
+.voice-panel h2,
+.voice-lines strong {
+  color: var(--primary);
+}
+
+.mistakes-preview,
+.caution-panel {
+  background: rgba(255, 238, 238, .72);
+}
+
+.coach-note,
+.warning-note,
+.form-alert,
+.image-generation-status {
+  color: #7A4B00;
+  background: rgba(245,166,35,.14);
+  border: 1px solid rgba(245,166,35,.28);
+}
+
+.progress-fill,
+.mini-progress span,
+.adherence-bar span {
+  background: var(--primary);
+}
+
+.progress-track,
+.mini-progress,
+.adherence-bar {
+  background: rgba(45,106,79,.14);
+}
+
+.plan-creator-layout {
+  max-width: 1280px;
+  display: grid;
+  grid-template-columns: minmax(320px, 40%) minmax(420px, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.plan-form-column,
+.live-preview-column {
+  min-width: 0;
+}
+
+.live-preview-column {
+  position: sticky;
+  top: 92px;
+}
+
+.phone-preview-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+.patient-view-badge {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  z-index: 2;
+  padding: 7px 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--primary);
+  font-size: .78rem;
+  font-weight: 900;
+}
+
+.phone-frame {
+  width: min(100%, 390px);
+  min-height: 720px;
+  padding: 22px 16px;
+  border: 12px solid #173F31;
+  border-radius: 42px;
+  background:
+    radial-gradient(circle at 70% 0%, rgba(245,166,35,.16), transparent 28%),
+    linear-gradient(135deg, #F0F7FF, #FFFFFF);
+  box-shadow: 0 28px 70px rgba(20,58,42,.22);
+  overflow: hidden;
+}
+
+.phone-speaker {
+  width: 72px;
+  height: 6px;
+  margin: 0 auto 18px;
+  border-radius: 999px;
+  background: rgba(20,58,42,.22);
+}
+
+.phone-greeting {
+  padding: 18px;
+  animation: shimmerIn 1.2s ease both;
+}
+
+.phone-greeting small,
+.phone-greeting p,
+.phone-ex-card span {
+  color: var(--muted);
+}
+
+.phone-greeting strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 1.45rem;
+}
+
+.phone-progress {
+  height: 8px;
+  margin: 14px 0 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(45,106,79,.14);
+}
+
+.phone-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: width .6s ease;
+}
+
+.phone-exercise-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.phone-ex-card {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  animation: fadeSlideUp .4s ease both;
+}
+
+.phone-ex-card img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.builder-step-preview {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.builder-step-row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 9px;
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  background: rgba(240,247,255,.62);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.builder-step-row:hover {
+  transform: translateY(-2px);
+  border-left-color: var(--primary);
+  box-shadow: 0 10px 24px rgba(45,106,79,.12);
+}
+
+.builder-step-row p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.floating-field {
+  position: relative;
+}
+
+.floating-field label {
+  position: absolute;
+  left: 12px;
+  top: -9px;
+  padding: 0 6px;
+  color: var(--primary);
+  background: rgba(255,255,255,.82);
+  border-radius: 999px;
+}
+
+@keyframes shimmerIn {
+  from {
+    opacity: 0;
+    background-position: -140px 0;
+  }
+  to {
+    opacity: 1;
+    background-position: 240px 0;
+  }
+}
+
+@media (max-width: 980px) {
+  .plan-creator-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .live-preview-column {
+    position: static;
+  }
+}
+
+/* Broad final-pass overrides so every visible screen uses the requested light PhysioPath theme. */
+.doctor-shell,
+.builder-container,
+.login-page,
+.patient-shell,
+.detail-shell,
+.workout-shell {
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% 8%, rgba(45,106,79,.12), transparent 30%),
+    radial-gradient(circle at 92% 12%, rgba(245,166,35,.16), transparent 26%),
+    linear-gradient(135deg, #F0F7FF 0%, #FFFFFF 68%);
+}
+
+.doctor-header,
+.section-heading,
+.panel-title-row,
+.hero-topline,
+.detail-title-row,
+.workout-title {
+  color: var(--ink);
+}
+
+.hero-glass-stat,
+.library-item,
+.success-modal,
+.share-link-box,
+.qr-container,
+.exercise-detail-hero,
+.pose-card,
+.step-item,
+.voice-lines,
+.heatmap-cell,
+.patient-table article,
+.workout-view,
+.countdown-ring,
+.rep-ring,
+.complete-mark {
+  color: var(--ink);
+  background: rgba(255,255,255,.62);
+  border: 1px solid rgba(255,255,255,.82);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+}
+
+.library-item,
+.step-item,
+.patient-table article,
+.workout-view {
+  border-radius: 16px;
+}
+
+.modal-overlay {
+  background: rgba(15, 48, 37, .18);
+  backdrop-filter: blur(18px);
+}
+
+.modal-content {
+  border-radius: 24px;
+}
+
+.logo-icon,
+.round-check,
+.complete-mark,
+.generated-step-fallback {
+  color: #fff;
+  background: var(--primary);
+}
+
+.hero-glass-stat strong,
+.radial-meter strong,
+.rep-ring strong,
+.complete-workout h1,
+.detail-title-row h1,
+.section-heading h2,
+.panel-title-row h2,
+.doctor-header h1,
+.login-header h1 {
+  color: var(--primary-dark);
+}
+
+.library-item:hover,
+.exercise-card:hover,
+.step-item:hover,
+.patient-table article:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px rgba(45,106,79,.18);
+}
+
+.exercise-detail-hero,
+.recovery-card {
+  background:
+    radial-gradient(circle at 84% 18%, rgba(245,166,35,.2), transparent 28%),
+    rgba(255,255,255,.62);
+}
+
+.exercise-visual,
+.image-pose-card {
+  background:
+    linear-gradient(135deg, rgba(240,247,255,.9), rgba(255,255,255,.72));
+  border: 1px solid rgba(255,255,255,.8);
+}
+
+.muscle-badge,
+.language-select option {
+  color: var(--ink);
+}
+
+.nav-item {
+  color: var(--muted);
+}
+
+.remove-btn,
+.close-modal-btn {
+  color: var(--primary);
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(255,255,255,.85);
+}
+
+.save-btn {
+  background: linear-gradient(135deg, var(--primary), #3F8B68);
+}
+
+.done-btn,
+.share-link-box button {
+  background: linear-gradient(135deg, var(--accent), #F8C461);
+  color: #173F31;
+}
+
+.library-grid,
+.exercise-stack,
+.steps-list,
+.recent-activity {
+  animation: fadeSlideUp .4s ease both;
 }

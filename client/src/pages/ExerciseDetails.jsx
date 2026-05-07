@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, Check, Clock, Mic2, Play, ShieldCheck } from 'lucide-react';
-import api from '../api/client';
 import LanguageSelect from '../components/LanguageSelect';
 import { exerciseDetailText, getExerciseGuide, getStoredLanguage } from '../data/languages';
 import { db } from '../db';
@@ -10,6 +9,7 @@ const speechLangMap = {
     en: 'en-US',
     hi: 'hi-IN',
     ta: 'ta-IN',
+    te: 'te-IN',
     kn: 'kn-IN',
     es: 'es-ES'
 };
@@ -57,9 +57,6 @@ const ExerciseDetails = () => {
     const [plan, setPlan] = useState(null);
     const [language, setLanguage] = useState(getStoredLanguage);
     const [isSpeaking, setIsSpeaking] = useState(false);
-    const [generatedImages, setGeneratedImages] = useState([]);
-    const [imageStatus, setImageStatus] = useState('idle');
-    const [imageError, setImageError] = useState('');
 
     useEffect(() => {
         db.plans.get(token).then(setPlan);
@@ -85,33 +82,6 @@ const ExerciseDetails = () => {
     const displayTips = useMemo(() => (
         guide?.pro_tips || exercise?.mistakes || []
     ), [exercise?.mistakes, guide]);
-
-    useEffect(() => {
-        if (!exercise || !displaySteps.length) return;
-
-        const generateImages = async () => {
-            setImageStatus('loading');
-            setImageError('');
-            try {
-                const response = await api.post('/gemini/exercise-images', {
-                    exerciseName: displayName,
-                    language,
-                    steps: displaySteps
-                });
-                setGeneratedImages(response.data.images || []);
-                if (response.data.warnings?.length) {
-                    setImageError(text.imageFallback);
-                }
-                setImageStatus('ready');
-            } catch (err) {
-                setGeneratedImages([]);
-                setImageError(err.response?.data?.message || 'Image generation unavailable right now.');
-                setImageStatus('error');
-            }
-        };
-
-        generateImages();
-    }, [displayName, displaySteps, exercise, language, text.imageFallback]);
 
     const buildDetailedExplanation = () => {
         const lines = [
@@ -164,14 +134,7 @@ const ExerciseDetails = () => {
             <main className="detail-main">
                 <section className="exercise-detail-hero">
                     <div className="pose-card image-pose-card">
-                        <img src="/medical-therapy-hero.svg" alt="" />
-                        <div className="bridge-figure">
-                            <span className="head" />
-                            <span className="torso" />
-                            <span className="hips" />
-                            <span className="leg left" />
-                            <span className="leg right" />
-                        </div>
+                        <img src={guide?.imageUrl || '/medical-therapy-hero.svg'} alt="" />
                     </div>
                     <div className="detail-title-row">
                         <span className="eyebrow">{exercise.muscleGroup}</span>
@@ -202,27 +165,11 @@ const ExerciseDetails = () => {
 
                 <section className="detail-panel">
                     <h2>{guide ? guide.total_reps : 'Step-by-step'}</h2>
-                    {imageStatus === 'loading' && (
-                        <div className="image-generation-status">{text.imageLoading}</div>
-                    )}
-                    {imageStatus === 'error' && (
-                        <div className="image-generation-status error">{imageError}</div>
-                    )}
-                    {imageStatus === 'ready' && imageError && (
-                        <div className="image-generation-status">{imageError}</div>
-                    )}
                     <div className="steps-list">
                         {displaySteps.map((step, index) => (
                             <div key={`${step.heading}-${index}`} className="step-item rich-step">
                                 <span>{index + 1}</span>
                                 <div>
-                                    {generatedImages[index]?.dataUrl ? (
-                                        <img className="generated-step-image" src={generatedImages[index].dataUrl} alt="" />
-                                    ) : (
-                                        <div className="generated-step-fallback">
-                                            <img src="/medical-therapy-hero.svg" alt="" />
-                                        </div>
-                                    )}
                                     <strong>{step.heading}</strong>
                                     <p>{step.instruction}</p>
                                 </div>
@@ -230,21 +177,6 @@ const ExerciseDetails = () => {
                         ))}
                     </div>
                 </section>
-
-                {guide && (
-                    <section className="detail-panel voice-panel">
-                        <h2><Mic2 size={18} /> {text.voiceTitle}</h2>
-                        <p>{guide.voice_intro}</p>
-                        <div className="voice-lines">
-                            {guide.steps.map((step, index) => (
-                                <blockquote key={`${step.heading}-voice`}>
-                                    <strong>{index + 1}. {step.heading}</strong>
-                                    {step.voice_guidance}
-                                </blockquote>
-                            ))}
-                        </div>
-                    </section>
-                )}
 
                 <section className="detail-panel caution-panel">
                     <h2><AlertTriangle size={18} /> {text.tipsTitle}</h2>
