@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle2, ChevronRight, Pause, Play, RotateCcw, ShieldAlert, Volume2, VolumeX, X } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Mic, Pause, Play, Plus, RotateCcw, ShieldAlert, Volume2, VolumeX, X } from 'lucide-react';
 import api from '../api/client';
 import { db } from '../db';
 import { getExerciseGuide, getStoredLanguage, workoutUiText } from '../data/languages';
@@ -25,6 +25,37 @@ const getVoiceForLanguage = (language) => {
         null;
 };
 
+const numberWords = {
+    one: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    ten: 10,
+    eleven: 11,
+    twelve: 12,
+    thirteen: 13,
+    fourteen: 14,
+    fifteen: 15,
+    sixteen: 16,
+    seventeen: 17,
+    eighteen: 18,
+    nineteen: 19,
+    twenty: 20
+};
+
+const extractSpokenNumber = (transcript) => {
+    const normalized = transcript.toLowerCase().replace(/[^a-z0-9\s]/g, ' ');
+    const directNumber = normalized.match(/\b\d+\b/);
+    if (directNumber) return Number(directNumber[0]);
+    const word = normalized.split(/\s+/).find((item) => numberWords[item]);
+    return word ? numberWords[word] : null;
+};
+
 const WorkoutEngine = () => {
     const { token } = useParams();
     const navigate = useNavigate();
@@ -38,9 +69,15 @@ const WorkoutEngine = () => {
     const [voiceEnabled, setVoiceEnabled] = useState(true);
     const [paused, setPaused] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [voiceCounting, setVoiceCounting] = useState(false);
+    const [voiceWarning, setVoiceWarning] = useState('');
+    const [voiceFallback, setVoiceFallback] = useState(false);
     const [language] = useState(getStoredLanguage);
     const timerRef = useRef(null);
     const wakeLockRef = useRef(null);
+    const recognitionRef = useRef(null);
+    const currentRepRef = useRef(0);
+    const currentExerciseRef = useRef(null);
 
     const currentExercise = plan?.exercises[currentIndex];
     const currentGuide = currentExercise ? getExerciseGuide(currentExercise.name, language) : null;
@@ -50,6 +87,14 @@ const WorkoutEngine = () => {
     const displayMistake = currentGuide?.pro_tips?.[0] || currentExercise?.mistakes?.[0] || 'Keep the motion slow and controlled.';
     const totalExercises = plan?.exercises.length || 1;
     const workoutPercent = Math.round(((currentIndex + (mode === 'COMPLETE' ? 1 : 0)) / totalExercises) * 100);
+
+    useEffect(() => {
+        currentRepRef.current = currentRep;
+    }, [currentRep]);
+
+    useEffect(() => {
+        currentExerciseRef.current = currentExercise;
+    }, [currentExercise]);
 
     useEffect(() => {
         const loadPlan = async () => {
@@ -76,8 +121,12 @@ const WorkoutEngine = () => {
         setTimer(5);
         setCurrentRep(0);
         setCurrentSet(1);
+        setVoiceWarning('');
+        stopListening();
         speak(`${text.exercise}. ${displayName}. ${currentGuide?.voice_intro || text.getReady}.`);
     }, [currentExercise?.id]);
+
+    useEffect(() => () => stopListening(), []);
 
     useEffect(() => {
         if (paused) return;
@@ -127,17 +176,88 @@ const WorkoutEngine = () => {
         window.speechSynthesis.speak(utterance);
     };
 
+    const completeSetOrRest = (nextRep, exercise = currentExercise) => {
+        if (!exercise) return;
+        if (nextRep >= exercise.reps) {
+            stopListening();
+            setMode('REST');
+            setTimer(exercise.restSeconds);
+            speak('Well done');
+            speak(`${text.setComplete} ${exercise.restSeconds} ${text.seconds}`);
+        }
+    };
+
     const handleRep = () => {
         if (mode !== 'ACTIVE' || !currentExercise) return;
         const nextRep = currentRep + 1;
         setCurrentRep(nextRep);
+        setVoiceWarning('');
         speak(String(nextRep));
+        completeSetOrRest(nextRep);
+    };
 
-        if (nextRep >= currentExercise.reps) {
-            setMode('REST');
-            setTimer(currentExercise.restSeconds);
-            speak(`${text.setComplete} ${currentExercise.restSeconds} ${text.seconds}`);
+    const acceptVoiceRep = (spokenNumber) => {
+        const exercise = currentExerciseRef.current;
+        if (!exercise || mode !== 'ACTIVE') return;
+        if (!spokenNumber || spokenNumber < 1 || spokenNumber > exercise.reps) return;
+
+        const expected = currentRepRef.current + 1;
+        if (spokenNumber !== expected) {
+            setVoiceWarning(`Please complete rep ${expected} first`);
+            return;
         }
+
+        currentRepRef.current = spokenNumber;
+        setCurrentRep(spokenNumber);
+        setVoiceWarning('');
+        speak(String(spokenNumber));
+        completeSetOrRest(spokenNumber, exercise);
+    };
+
+    const startListening = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            setVoiceFallback(true);
+            setVoiceWarning('Voice counting is not supported here. Use the manual + button.');
+            return;
+        }
+
+        try {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.onresult = (event) => {
+                const latest = event.results[event.results.length - 1];
+                const transcript = latest?.[0]?.transcript || '';
+                acceptVoiceRep(extractSpokenNumber(transcript));
+            };
+            recognition.onerror = () => {
+                setVoiceFallback(true);
+                setVoiceCounting(false);
+                setVoiceWarning('Mic permission denied or unavailable. Use manual counting.');
+            };
+            recognition.onend = () => setVoiceCounting(false);
+            recognitionRef.current = recognition;
+            recognition.start();
+            setVoiceWarning('');
+            setVoiceFallback(false);
+            setVoiceCounting(true);
+        } catch (error) {
+            console.warn('Speech recognition unavailable:', error);
+            setVoiceFallback(true);
+            setVoiceCounting(false);
+            setVoiceWarning('Voice counting is unavailable. Use manual counting.');
+        }
+    };
+
+    const stopListening = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.onend = null;
+            recognitionRef.current.stop();
+            recognitionRef.current = null;
+        }
+        setVoiceCounting(false);
     };
 
     const advanceAfterRest = () => {
@@ -146,6 +266,7 @@ const WorkoutEngine = () => {
             setCurrentSet((value) => value + 1);
             setCurrentRep(0);
             setMode('ACTIVE');
+            setVoiceWarning('');
             speak(text.nextSet);
             return;
         }
@@ -239,10 +360,34 @@ const WorkoutEngine = () => {
                             <span className="set-chip">{text.set} {currentSet} {text.of} {currentExercise.sets}</span>
 
                             <button className="rep-ring" style={{ '--rep-ring': activeRing }} onClick={handleRep}>
-                                <strong>{currentRep}</strong>
+                                <strong className="rep-count-pop" key={currentRep}>{currentRep}</strong>
                                 <span>{text.of} {currentExercise.reps}</span>
-                                <em>{text.tapAfterRep}</em>
+                                <em>{currentExercise.reps - currentRep} remaining</em>
                             </button>
+
+                            <div className="rep-status-strip">
+                                <strong>Current rep: {Math.min(currentRep + 1, currentExercise.reps)}</strong>
+                                <span>{currentExercise.reps - currentRep} reps remaining</span>
+                            </div>
+
+                            <div className="voice-rep-panel">
+                                <button className="icon-text-btn" onClick={voiceCounting ? stopListening : startListening}>
+                                    <Mic size={18} />
+                                    {voiceCounting ? 'Stop voice count' : 'Start Exercise'}
+                                </button>
+                                <button className="icon-text-btn" onClick={handleRep}>
+                                    <Plus size={18} />
+                                    Manual +
+                                </button>
+                                <span>{voiceCounting ? 'Listening for rep numbers...' : voiceFallback ? 'Manual mode is always available.' : 'Say one, two, three...'}</span>
+                            </div>
+
+                            {voiceWarning && (
+                                <div className="voice-warning">
+                                    <ShieldAlert size={18} />
+                                    <p>{voiceWarning}</p>
+                                </div>
+                            )}
 
                             <div className="form-alert">
                                 <ShieldAlert size={20} />

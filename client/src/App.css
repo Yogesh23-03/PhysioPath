@@ -573,6 +573,68 @@ button { cursor: pointer; }
 .rep-ring em { grid-row: 4; font-size: 0.8rem; align-self: start; margin-top: 8px; }
 .form-alert { max-width: 420px; margin-inline: auto; text-align: left; background: #fff6ec; }
 .workout-controls { display: flex; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.rep-count-pop {
+  animation: repCountPop .22s ease;
+}
+
+.rep-status-strip,
+.voice-rep-panel,
+.voice-warning {
+  max-width: 430px;
+  margin: 12px auto 0;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.68);
+  border: 1px solid rgba(255,255,255,.86);
+  box-shadow: 0 12px 28px rgba(45,106,79,.1);
+  backdrop-filter: blur(18px);
+}
+
+.rep-status-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--primary-dark);
+  font-weight: 900;
+}
+
+.rep-status-strip span,
+.voice-rep-panel span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.voice-rep-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: center;
+}
+
+.voice-rep-panel span {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.voice-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #9F3A00;
+  background: rgba(245,166,35,.14);
+  border-color: rgba(245,166,35,.28);
+}
+
+.voice-warning p {
+  margin: 0;
+  font-weight: 900;
+}
+
+@keyframes repCountPop {
+  0% { transform: scale(.88); opacity: .72; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
 .rest-workout h1 { font-size: clamp(5rem, 24vw, 9rem); color: var(--primary); }
 .complete-mark {
   width: 92px;
