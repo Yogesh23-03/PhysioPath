@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Save, Plus, Trash2, Search, Info, AlertTriangle } from 'lucide-react';
 import { exerciseLibrary } from '../data/exercises';
@@ -9,6 +9,8 @@ import { QRCodeCanvas } from 'qrcode.react';
 
 const PlanBuilder = () => {
     const navigate = useNavigate();
+    const { token } = useParams();
+    const isEditMode = Boolean(token);
     const [patientName, setPatientName] = useState('');
     const [durationWeeks, setDurationWeeks] = useState(4);
     const [selectedExercises, setSelectedExercises] = useState([]);
@@ -17,6 +19,33 @@ const PlanBuilder = () => {
     const [generatedToken, setGeneratedToken] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(false);
+    const [initialLoading, setInitialLoading] = useState(isEditMode);
+
+    useEffect(() => {
+        if (!isEditMode) return;
+
+        const loadPlan = async () => {
+            try {
+                const response = await api.get(`/plans/${token}`);
+                const plan = response.data;
+                setPatientName(plan.patientName);
+                setDurationWeeks(plan.durationWeeks);
+                setSelectedExercises((plan.exercises || []).map((exercise) => ({
+                    ...exercise,
+                    instanceId: exercise._id || `${exercise.id}-${Date.now()}-${Math.random()}`
+                })));
+                setGeneratedToken(plan.token);
+            } catch (error) {
+                console.error('Error loading plan:', error);
+                alert('Unable to load this patient plan.');
+                navigate('/dashboard');
+            } finally {
+                setInitialLoading(false);
+            }
+        };
+
+        loadPlan();
+    }, [isEditMode, navigate, token]);
 
     const addExercise = (exercise) => {
         const newExercise = {
@@ -38,6 +67,32 @@ const PlanBuilder = () => {
         setSelectedExercises(selectedExercises.map(ex => 
             ex.instanceId === instanceId ? { ...ex, [field]: value } : ex
         ));
+    };
+
+    const updateExerciseStep = (instanceId, order, instruction) => {
+        setSelectedExercises(selectedExercises.map((ex) => (
+            ex.instanceId === instanceId
+                ? {
+                    ...ex,
+                    steps: ex.steps.map((step) => (
+                        step.order === order ? { ...step, instruction } : step
+                    ))
+                }
+                : ex
+        )));
+    };
+
+    const updateExerciseMistake = (instanceId, index, value) => {
+        setSelectedExercises(selectedExercises.map((ex) => (
+            ex.instanceId === instanceId
+                ? {
+                    ...ex,
+                    mistakes: ex.mistakes.map((mistake, mistakeIndex) => (
+                        mistakeIndex === index ? value : mistake
+                    ))
+                }
+                : ex
+        )));
     };
 
     const handleSave = async () => {
@@ -64,7 +119,9 @@ const PlanBuilder = () => {
                     mistakes: ex.mistakes
                 }))
             };
-            const response = await api.post('/plans', planData);
+            const response = isEditMode
+                ? await api.put(`/plans/${token}`, planData)
+                : await api.post('/plans', planData);
             setGeneratedToken(response.data.token);
             setShowSuccess(true);
         } catch (error) {
@@ -82,15 +139,19 @@ const PlanBuilder = () => {
 
     const shareUrl = `${window.location.origin}/patient/${generatedToken}`;
 
+    if (initialLoading) {
+        return <div className="loading-screen">Loading patient plan...</div>;
+    }
+
     return (
         <div className="builder-container">
             <header className="builder-header">
                 <button onClick={() => navigate('/dashboard')} className="back-btn">
                     <ChevronLeft size={20} /> Back
                 </button>
-                <h1>Create Exercise Plan</h1>
+                <h1>{isEditMode ? 'Edit Patient Plan' : 'Create Exercise Plan'}</h1>
                 <button onClick={handleSave} disabled={loading} className="save-btn">
-                    <Save size={20} /> {loading ? 'Saving...' : 'Save Plan'}
+                    <Save size={20} /> {loading ? 'Saving...' : isEditMode ? 'Update Plan' : 'Save Plan'}
                 </button>
             </header>
 
@@ -174,18 +235,31 @@ const PlanBuilder = () => {
                                                 <Trash2 size={18} />
                                             </button>
                                         </div>
-                                        <div className="builder-step-preview">
-                                            {ex.steps.slice(0, 3).map((step) => (
+                                        <div className="builder-step-preview editable-steps">
+                                            {ex.steps.map((step) => (
                                                 <div key={step.order} className="builder-step-row">
                                                     <span>⠿</span>
-                                                    <p>{step.instruction}</p>
+                                                    <textarea
+                                                        value={step.instruction}
+                                                        onChange={(event) => updateExerciseStep(ex.instanceId, step.order, event.target.value)}
+                                                        aria-label={`${ex.name} step ${step.order}`}
+                                                    />
                                                 </div>
                                             ))}
                                         </div>
                                         {ex.mistakes.length > 0 && (
-                                            <div className="mistakes-preview">
+                                            <div className="mistakes-preview editable-mistakes">
                                                 <AlertTriangle size={14} />
-                                                <span>{ex.mistakes[0]} and more...</span>
+                                                <div>
+                                                    {ex.mistakes.map((mistake, index) => (
+                                                        <input
+                                                            key={`${ex.instanceId}-mistake-${index}`}
+                                                            value={mistake}
+                                                            onChange={(event) => updateExerciseMistake(ex.instanceId, index, event.target.value)}
+                                                            aria-label={`${ex.name} mistake ${index + 1}`}
+                                                        />
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                     </motion.div>
@@ -285,7 +359,7 @@ const PlanBuilder = () => {
                             className="modal-content success-modal"
                         >
                             <div className="success-header">
-                                <h2>Plan Created Successfully!</h2>
+                                <h2>{isEditMode ? 'Plan Updated Successfully!' : 'Plan Created Successfully!'}</h2>
                                 <p>Scan the QR code below or share the link with <strong>{patientName}</strong>.</p>
                             </div>
                             

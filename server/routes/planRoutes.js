@@ -45,6 +45,21 @@ router.get('/', protect, async (req, res) => {
     }
 });
 
+// Update a plan for the logged-in therapist
+router.put('/:token', protect, async (req, res) => {
+    try {
+        const plan = await Plan.findOneAndUpdate(
+            { token: req.params.token, therapistId: req.user.id },
+            req.body,
+            { new: true, runValidators: true }
+        );
+        if (!plan) return res.status(404).json({ message: 'Plan not found' });
+        res.json(plan);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // Get a plan by token (Patient - No auth required as per PRD)
 router.get('/:token', async (req, res) => {
     try {

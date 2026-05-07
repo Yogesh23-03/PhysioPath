@@ -7,10 +7,12 @@ import {
     ChevronDown,
     ClipboardList,
     LogIn,
+    Menu,
     QrCode,
     Smartphone,
     Sparkles,
     WifiOff,
+    X
 } from 'lucide-react';
 
 const featureCards = [
@@ -49,6 +51,13 @@ const flowSteps = [
     ['URL Encoding', QrCode],
     ['Patient First Load', Smartphone],
     ['Forever Offline', WifiOff]
+];
+
+const navItems = [
+    ['How It Works', 'how'],
+    ['For Therapists', 'therapists'],
+    ['For Patients', 'patients'],
+    ['Features', 'features']
 ];
 
 const ThreeHeroScene = () => {
@@ -147,7 +156,7 @@ const ThreeHeroScene = () => {
     return <div className="landing-three-scene" ref={mountRef} aria-hidden="true" />;
 };
 
-const TiltCard = ({ children, className = '' }) => {
+const TiltCard = ({ children, className = '', ...props }) => {
     const ref = useRef(null);
 
     const handleMove = (event) => {
@@ -164,7 +173,7 @@ const TiltCard = ({ children, className = '' }) => {
     };
 
     return (
-        <article ref={ref} className={`tilt-card ${className}`} onMouseMove={handleMove} onMouseLeave={handleLeave}>
+        <article ref={ref} className={`tilt-card ${className}`} onMouseMove={handleMove} onMouseLeave={handleLeave} {...props}>
             {children}
         </article>
     );
@@ -174,6 +183,7 @@ const LandingPage = () => {
     const navigate = useNavigate();
     const [count, setCount] = useState(4);
     const [confetti, setConfetti] = useState(false);
+    const [navOpen, setNavOpen] = useState(false);
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -192,6 +202,13 @@ const LandingPage = () => {
         window.setTimeout(() => setConfetti(false), 900);
     };
 
+    const scrollToSection = (sectionId) => {
+        const target = document.getElementById(sectionId);
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setNavOpen(false);
+    };
+
     return (
         <div className="landing-page">
             <ThreeHeroScene />
@@ -201,12 +218,22 @@ const LandingPage = () => {
                     <span>💊</span>
                     <strong>PhysioPath</strong>
                 </Link>
-                <div className="landing-links">
-                    <a href="#how">How It Works</a>
-                    <a href="#therapists">For Therapists</a>
-                    <a href="#patients">For Patients</a>
-                    <a href="#features">Features</a>
+                <div className={`landing-links ${navOpen ? 'open' : ''}`}>
+                    {navItems.map(([label, sectionId]) => (
+                        <button key={sectionId} type="button" onClick={() => scrollToSection(sectionId)}>
+                            {label}
+                        </button>
+                    ))}
                 </div>
+                <button
+                    className="landing-menu-btn"
+                    type="button"
+                    onClick={() => setNavOpen((value) => !value)}
+                    aria-label="Toggle navigation"
+                    aria-expanded={navOpen}
+                >
+                    {navOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
                 <button className="amber-cta ripple-btn" onClick={() => navigate('/login')}>Get Started</button>
             </nav>
 
@@ -221,7 +248,7 @@ const LandingPage = () => {
                     <p>Your therapist creates the plan. You follow it — anywhere, anytime. No internet needed.</p>
                     <div className="hero-actions">
                         <button className="mint-cta" onClick={() => navigate('/login')}>I'm a Therapist <ArrowRight size={18} /></button>
-                        <a className="glass-cta" href="#patients">I'm a Patient <ArrowRight size={18} /></a>
+                        <button className="glass-cta" type="button" onClick={() => scrollToSection('patients')}>I'm a Patient <ArrowRight size={18} /></button>
                     </div>
                 </section>
 
@@ -255,9 +282,9 @@ const LandingPage = () => {
                     </div>
                 </section>
 
-                <a className="scroll-indicator" href="#features" aria-label="Scroll to features">
+                <button className="scroll-indicator" type="button" onClick={() => scrollToSection('features')} aria-label="Scroll to features">
                     <ChevronDown />
-                </a>
+                </button>
             </header>
 
             <main>
@@ -348,7 +375,7 @@ const LandingPage = () => {
                         <p>Built for hackathon. Designed for real recovery.</p>
                         <div className="hero-actions">
                             <button className="mint-cta" onClick={() => navigate('/login')}>Therapist Demo <ArrowRight size={18} /></button>
-                            <a className="glass-cta" href="#patients">Patient Demo <ArrowRight size={18} /></a>
+                            <button className="glass-cta" type="button" onClick={() => scrollToSection('patients')}>Patient Demo <ArrowRight size={18} /></button>
                         </div>
                     </div>
                     <form className="demo-form glass-card fade-up" onSubmit={handleDemoSubmit}>
@@ -381,10 +408,11 @@ const LandingPage = () => {
                     <small>© 2026 PhysioPath Hackathon</small>
                 </div>
                 <nav>
-                    <a href="#how">How It Works</a>
-                    <a href="#therapists">For Therapists</a>
-                    <a href="#patients">For Patients</a>
-                    <a href="#features">Features</a>
+                    {navItems.map(([label, sectionId]) => (
+                        <button key={sectionId} type="button" onClick={() => scrollToSection(sectionId)}>
+                            {label}
+                        </button>
+                    ))}
                 </nav>
                 <div className="footer-actions">
                     <Link to="/login"><LogIn size={17} /> Therapist Login</Link>

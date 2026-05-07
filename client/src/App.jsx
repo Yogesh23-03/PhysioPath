@@ -46,6 +46,14 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/builder/:token" 
+        element={
+          <ProtectedRoute>
+            <PlanBuilder />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="/patient/:token" element={<PatientPortal />} />
       <Route path="/exercise/:token/:exerciseId" element={<ExerciseDetails />} />
       <Route path="/workout/:token" element={<WorkoutEngine />} />
