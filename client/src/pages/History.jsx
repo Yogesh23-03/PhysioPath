@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Award, Calendar as CalendarIcon, CheckCircle2, ChevronLeft, Flame, TrendingUp } from 'lucide-react';
 import { db } from '../db';
+import { getLatestPlan } from '../db/planStore';
 import { getStoredLanguage, historyUiText } from '../data/languages';
 
 const History = () => {
@@ -16,7 +17,7 @@ const History = () => {
     useEffect(() => {
         const loadHistory = async () => {
             const [localPlan, localLogs] = await Promise.all([
-                db.plans.get(token),
+                getLatestPlan(token).catch(() => db.plans.get(token)),
                 db.daily_logs.where({ token }).toArray()
             ]);
             setPlan(localPlan);

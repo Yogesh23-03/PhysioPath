@@ -1,14 +1,20 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      strategies: "injectManifest",
+      srcDir: "public",
+      filename: "reminder-sw.js",
+      devOptions: {
+        enabled: true,
+        type: "module",
+      },
       includeAssets: [
+
         'favicon.svg',
         'icons.svg',
         'quadsets.jpeg',
@@ -33,25 +39,43 @@ export default defineConfig({
         'medical-therapy-hero.svg',
         'physio-device-hero.svg',
         'therapy-team.svg'
+
+        "favicon.svg",
+        "icons.svg",
+        "quadsets.jpeg",
+        "glutebridges.jpeg",
+        "wallslides.jpeg",
+        "anklepumps.jpeg",
+        "legraises.jpeg",
+        "straightlegraises.jpeg",
+        "clamshells.jpeg",
+        "seatedkneeExtension.jpeg",
+        "medical-plan.svg",
+        "medical-progress.svg",
+        "medical-tech-hero.svg",
+        "medical-therapy-hero.svg",
+        "physio-device-hero.svg",
+        "therapy-team.svg",
+
       ],
       manifest: {
-        name: 'PhysioPath',
-        short_name: 'PhysioPath',
-        description: 'Offline-first physiotherapy exercise guidance',
-        theme_color: '#1A7A4A',
+        name: "PhysioPath",
+        short_name: "PhysioPath",
+        description: "Offline-first physiotherapy exercise guidance",
+        theme_color: "#1A7A4A",
         icons: [
           {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
           },
           {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      }
-    })
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
+    }),
   ],
-})
+});

@@ -42,6 +42,13 @@ const archivePlan = async (plan, completedAt = new Date()) => {
     return completed;
 };
 
+const buildPlanPayload = (body) => ({
+    patientName: body.patientName,
+    durationWeeks: body.durationWeeks,
+    exercises: body.exercises,
+    expiresAt: body.expiresAt
+});
+
 const applyPlanProgress = async (plan, completedExerciseIds = []) => {
     const uniqueIds = [...new Set(completedExerciseIds.map(String))];
     const totalExercises = plan.exercises?.length || 0;
@@ -72,7 +79,7 @@ router.post('/', protect, async (req, res) => {
     try {
         const token = crypto.randomBytes(8).toString('hex');
         const plan = new Plan({
-            ...req.body,
+            ...buildPlanPayload(req.body),
             token,
             therapistId: req.user.id
         });
@@ -205,7 +212,13 @@ router.put('/:token', protect, async (req, res) => {
     try {
         const plan = await Plan.findOneAndUpdate(
             { token: req.params.token, therapistId: req.user.id },
-            req.body,
+            {
+                ...buildPlanPayload(req.body),
+                completedExerciseIds: [],
+                progressPercent: 0,
+                status: 'pending',
+                $unset: { lastProgressAt: 1 }
+            },
             { new: true, runValidators: true }
         );
         if (!plan) return res.status(404).json({ message: 'Plan not found' });

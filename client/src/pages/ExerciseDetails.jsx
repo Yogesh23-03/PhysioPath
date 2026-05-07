@@ -4,7 +4,7 @@ import { AlertTriangle, ArrowLeft, Check, Clock, Mic2, Play, ShieldCheck } from 
 import LanguageSelect from '../components/LanguageSelect';
 import { getExerciseDemoUrl } from '../data/exerciseMedia';
 import { exerciseDetailText, getExerciseGuide, getStoredLanguage } from '../data/languages';
-import { db } from '../db';
+import { getLatestPlan } from '../db/planStore';
 
 const speechLangMap = {
     en: 'en-US',
@@ -61,7 +61,7 @@ const ExerciseDetails = () => {
     const [mediaMode, setMediaMode] = useState('video');
 
     useEffect(() => {
-        db.plans.get(token).then(setPlan);
+        getLatestPlan(token).then(setPlan).catch(() => setPlan(null));
     }, [token]);
 
     useEffect(() => () => {

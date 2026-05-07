@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, ChevronRight, Mic, Pause, Play, Plus, RotateCcw, ShieldAlert, Volume2, VolumeX, X } from 'lucide-react';
 import api from '../api/client';
 import { db } from '../db';
+import { getLatestPlan } from '../db/planStore';
 import { getExerciseGuide, getStoredLanguage, workoutUiText } from '../data/languages';
 
 const speechLangMap = {
@@ -98,7 +99,7 @@ const WorkoutEngine = () => {
 
     useEffect(() => {
         const loadPlan = async () => {
-            const localPlan = await db.plans.get(token);
+            const localPlan = await getLatestPlan(token).catch(() => null);
             if (localPlan) {
                 const requestedId = location.state?.exerciseId;
                 const requestedIndex = requestedId
