@@ -38,14 +38,22 @@ const PatientPortal = () => {
   const [loading, setLoading] = useState(true);
   const [language, setLanguage] = useState(getStoredLanguage);
   const [selectedRating, setSelectedRating] = useState(0);
-  const [ratingSubmitted, setRatingSubmitted] = useState(
-    () => localStorage.getItem(`physiopath-rated-${token}`) === "true",
+  // ✅ After
+const [ratingSubmitted, setRatingSubmitted] = useState(false);
+
+useEffect(() => {
+  if (!token) return;
+  setRatingSubmitted(
+    localStorage.getItem(`physiopath-rated-${token}`) === "true"
   );
+}, [token]);
   const [ratingMessage, setRatingMessage] = useState("");
 
   const today = todayKey();
   const text = patientUiText[language] || patientUiText.en;
-  const patientShareUrl = `${window.location.origin}/patient/${token}`;
+const patientShareUrl = token 
+  ? `${window.location.origin}/patient/${token}` 
+  : '';
 
   useEffect(() => {
     const initPlan = async () => {
