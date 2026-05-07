@@ -3,7 +3,7 @@ import { db } from './index';
 
 export const getLatestPlan = async (token) => {
     try {
-        const response = await api.get(`/plans/${token}`);
+        const response = await api.get(`/api/plans/${token}`);
         await db.plans.put(response.data);
         return response.data;
     } catch (error) {
