@@ -321,7 +321,7 @@ const Dashboard = () => {
                             <CheckCircle2 size={28} />
                         </div>
                         {loading && renderEmpty('Loading completed patients...')}
-                        {!loading && completedPlans.length === 0 && renderEmpty('No completed patients yet. Finished plans will appear here after their duration ends.')}
+                        {!loading && completedPlans.length === 0 && renderEmpty('No completed patients yet. Finished plans will appear here after patients complete all exercises.')}
                         {!loading && completedPlans.length > 0 && (
                             <div className="completed-patients-grid">
                                 {completedPlans.map((record) => (

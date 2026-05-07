@@ -38,7 +38,6 @@ const archivePlan = async (plan, completedAt = new Date()) => {
         { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    await Plan.deleteOne({ _id: plan._id });
     return completed;
 };
 
