@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Plan = require('../models/Plan');
 const CompletedPlan = require('../models/CompletedPlan');
+const User = require('../models/User');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
@@ -119,6 +120,46 @@ router.post('/:token/complete', async (req, res) => {
 
         const completed = await archivePlan(plan, new Date());
         res.json({ completed: true, record: completed });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Rate the doctor assigned to a patient plan
+router.post('/:token/rate', async (req, res) => {
+    try {
+        const rating = Number(req.body?.rating);
+        if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+            return res.status(400).json({ message: 'Rating must be between 1 and 5.' });
+        }
+
+        const plan = await Plan.findOne({ token: req.params.token }).select('therapistId');
+        const completedPlan = plan ? null : await CompletedPlan.findOne({ originalPlanToken: req.params.token }).select('therapistId');
+        const therapistId = plan?.therapistId || completedPlan?.therapistId;
+
+        if (!therapistId) {
+            return res.status(404).json({ message: 'Doctor for this plan was not found.' });
+        }
+
+        const doctor = await User.findById(therapistId).select('rating ratingCount');
+        if (!doctor) return res.status(404).json({ message: 'Doctor not found.' });
+
+        const currentCount = doctor.ratingCount || 0;
+        const currentTotal = (doctor.rating || 0) * currentCount;
+        const nextCount = currentCount + 1;
+        const nextRating = Math.round(((currentTotal + rating) / nextCount) * 10) / 10;
+
+        const updatedDoctor = await User.findByIdAndUpdate(
+            therapistId,
+            { rating: nextRating, ratingCount: nextCount },
+            { new: true }
+        ).select('rating ratingCount');
+
+        res.json({
+            message: 'Doctor rating updated',
+            rating: updatedDoctor.rating,
+            ratingCount: updatedDoctor.ratingCount
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

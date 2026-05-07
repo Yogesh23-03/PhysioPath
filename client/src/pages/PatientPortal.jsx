@@ -31,6 +31,9 @@ const PatientPortal = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [language, setLanguage] = useState(getStoredLanguage);
+    const [selectedRating, setSelectedRating] = useState(0);
+    const [ratingSubmitted, setRatingSubmitted] = useState(() => localStorage.getItem(`physiopath-rated-${token}`) === 'true');
+    const [ratingMessage, setRatingMessage] = useState('');
 
     const today = todayKey();
     const text = patientUiText[language] || patientUiText.en;
@@ -84,6 +87,22 @@ const PatientPortal = () => {
             } catch (error) {
                 console.warn('Unable to sync completed plan yet:', error.response?.data?.message || error.message);
             }
+        }
+    };
+
+    const submitDoctorRating = async () => {
+        if (!selectedRating) {
+            setRatingMessage('Please select a rating first.');
+            return;
+        }
+
+        try {
+            await api.post(`/plans/${token}/rate`, { rating: selectedRating });
+            localStorage.setItem(`physiopath-rated-${token}`, 'true');
+            setRatingSubmitted(true);
+            setRatingMessage('Thank you. Your rating has been sent to the doctor profile.');
+        } catch (error) {
+            setRatingMessage(error.response?.data?.message || 'Unable to submit rating right now.');
         }
     };
 
@@ -236,6 +255,34 @@ const PatientPortal = () => {
                     <div className="patient-qr-box">
                         <QRCodeCanvas value={patientShareUrl} size={132} />
                     </div>
+                </section>
+
+                <section className="doctor-rating-card">
+                    <div>
+                        <span className="eyebrow">Doctor Rating</span>
+                        <h2>Rate your recovery support</h2>
+                        <p>Your feedback updates the doctor profile.</p>
+                    </div>
+                    <div className="doctor-rating-actions">
+                        <div className="star-rating-row" aria-label="Rate doctor from 1 to 5 stars">
+                            {[1, 2, 3, 4, 5].map((rating) => (
+                                <button
+                                    key={rating}
+                                    type="button"
+                                    className={rating <= selectedRating ? 'active' : ''}
+                                    onClick={() => setSelectedRating(rating)}
+                                    disabled={ratingSubmitted}
+                                    aria-label={`${rating} star rating`}
+                                >
+                                    ★
+                                </button>
+                            ))}
+                        </div>
+                        <button className="secondary-action" onClick={submitDoctorRating} disabled={ratingSubmitted}>
+                            {ratingSubmitted ? 'Rating submitted' : 'Submit rating'}
+                        </button>
+                    </div>
+                    {ratingMessage && <p className="rating-message">{ratingMessage}</p>}
                 </section>
 
                 <div className="warning-note">

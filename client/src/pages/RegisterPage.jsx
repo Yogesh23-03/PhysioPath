@@ -9,6 +9,9 @@ const RegisterPage = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [licenseNumber, setLicenseNumber] = useState('');
+    const [stateMedicalCouncil, setStateMedicalCouncil] = useState('');
+    const [photoUrl, setPhotoUrl] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { login } = useAuth();
@@ -20,7 +23,7 @@ const RegisterPage = () => {
         setLoading(true);
 
         try {
-            await api.post('/auth/register', { name, email, password });
+            await api.post('/auth/register', { name, email, password, licenseNumber, stateMedicalCouncil, photoUrl });
             await login(email, password);
             navigate('/dashboard');
         } catch (err) {
@@ -28,6 +31,14 @@ const RegisterPage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handlePhotoUpload = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => setPhotoUrl(reader.result);
+        reader.readAsDataURL(file);
     };
 
     return (
@@ -89,8 +100,87 @@ const RegisterPage = () => {
                         />
                     </div>
 
+                    <div className="input-group">
+                        <label>Medical License Number (NMC Registration No.)</label>
+                        <input
+                            type="text"
+                            placeholder="Enter your NMC registration number"
+                            value={licenseNumber}
+                            onChange={(event) => setLicenseNumber(event.target.value)}
+                            required
+                            minLength={5}
+                            pattern="[A-Za-z0-9]+"
+                            title="Use only letters and numbers, minimum 5 characters"
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label>State Medical Council</label>
+                        <select
+                            value={stateMedicalCouncil}
+                            onChange={(event) => setStateMedicalCouncil(event.target.value)}
+                            required
+                        >
+                            <option value="">Select state medical council</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Delhi">Delhi</option>
+                        </select>
+                    </div>
+
+                    <div className="input-group">
+                        <label>Profile Photo URL</label>
+                        <input
+                            type="url"
+                            placeholder="Paste your profile photo URL"
+                            value={photoUrl.startsWith('data:') ? '' : photoUrl}
+                            onChange={(event) => setPhotoUrl(event.target.value)}
+                        />
+                    </div>
+
+                    <div className="input-group">
+                        <label>Or Upload Profile Picture</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePhotoUpload}
+                        />
+                        {photoUrl && (
+                            <div className="register-photo-preview">
+                                <img src={photoUrl} alt="Profile preview" />
+                                <span>{photoUrl.startsWith('data:') ? 'Uploaded image selected' : 'Photo URL selected'}</span>
+                            </div>
+                        )}
+                    </div>
+
                     <button type="submit" disabled={loading} className="login-btn">
-                        {loading ? <Loader2 className="spin" /> : 'Create Account'}
+                        {loading ? <><Loader2 className="spin" /> Verifying with NMC...</> : 'Create Account'}
                     </button>
                 </form>
 

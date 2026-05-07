@@ -6,14 +6,17 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, default: 'therapist' },
+    licenseNumber: { type: String, required: true, unique: true, trim: true },
+    stateMedicalCouncil: { type: String, required: true },
     specialization: { type: String, default: 'Orthopedic Physiotherapist' },
     yearsOfExperience: { type: Number, default: 8 },
     address: { type: String, default: 'PhysioPath Recovery Clinic, Bengaluru' },
     workingAt: { type: String, default: 'PhysioPath Care Studio' },
     photoUrl: { type: String, default: '' },
     documentName: { type: String, default: 'Physiotherapy License.pdf' },
-    isVerified: { type: Boolean, default: true },
-    rating: { type: Number, default: 4.8 }
+    isVerified: { type: Boolean, default: false },
+    rating: { type: Number, default: 4.8 },
+    ratingCount: { type: Number, default: 0 }
 }, { timestamps: true });
 
 userSchema.pre('save', async function() {
