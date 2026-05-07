@@ -3,6 +3,11 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  base: "/",                          // ADD THIS
+  build: {
+    outDir: "../server/public",       // ADD THIS
+    emptyOutDir: true,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -14,7 +19,6 @@ export default defineConfig({
         type: "module",
       },
       includeAssets: [
-
         'favicon.svg',
         'icons.svg',
         'quadsets.jpeg',
@@ -39,24 +43,6 @@ export default defineConfig({
         'medical-therapy-hero.svg',
         'physio-device-hero.svg',
         'therapy-team.svg',
-
-        "favicon.svg",
-        "icons.svg",
-        "quadsets.jpeg",
-        "glutebridges.jpeg",
-        "wallslides.jpeg",
-        "anklepumps.jpeg",
-        "legraises.jpeg",
-        "straightlegraises.jpeg",
-        "clamshells.jpeg",
-        "seatedkneeExtension.jpeg",
-        "medical-plan.svg",
-        "medical-progress.svg",
-        "medical-tech-hero.svg",
-        "medical-therapy-hero.svg",
-        "physio-device-hero.svg",
-        "therapy-team.svg",
-
       ],
       manifest: {
         name: "PhysioPath",
